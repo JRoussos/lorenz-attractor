@@ -3,10 +3,11 @@ import React, { useEffect, useRef } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import { Vector3, AdditiveBlending, Euler, Quaternion } from 'three'
-
-import "./App.css"
 import { Bloom, EffectComposer } from "@react-three/postprocessing"
 import { KernelSize } from 'postprocessing'
+
+import Music from "./music"
+import "./App.css"
 
 const Line = ({ stPoint, color }) => {
     const SIGMA = 10
@@ -32,8 +33,6 @@ const Line = ({ stPoint, color }) => {
         ))
         
         meshRef.current.geometry.setFromPoints(points)
-
-        if(number_of_points === 300 ) console.log(x, y, z)
 
         if(number_of_points > MAX_POINTS) points.splice(0, 1)
         else number_of_points ++
@@ -61,9 +60,9 @@ const Lines = () => {
         {starting_point: new Vector3(0.03, 0.01, 0.01), color: '#deac52'}, // #eec170 
     ]
 
-    useFrame(() => {
+    useFrame(({ camera }) => {
         if( rotate.current ) {
-            rotation += 0.0005
+            rotation += 0.0005 * (camera.position.z /200) // Slow rotation speed as the user zooms in
  
             rotationEuler.set( rotation, rotation, 0 )
             rotationQuaternion.setFromEuler(rotationEuler)
@@ -100,16 +99,24 @@ const App = () => {
         near: 0.01
     }
 
+    useEffect(() => {
+        window.addEventListener('dblclick', () => {
+            if(!document.fullscreenElement) document.getElementById('canvas-container').requestFullscreen()
+            else document.exitFullscreen()
+        })
+    }, [])
+
     return (
-        <div className="canvas-container">
+        <div id="canvas-container">
             <Canvas dpr={[window.devicePixelRatio, 2]} camera={cameraProps}>
                 <color attach="background" args={['black']} />
                 <Lines/>
                 <EffectComposer>
                     <Bloom kernelSize={KernelSize.HUGE} luminanceThreshold={0} luminanceSmoothing={0} intensity={0.5} />
                 </EffectComposer>
-                <OrbitControls/>
+                <OrbitControls maxDistance={200}/>
             </Canvas>
+            <Music/>
         </div>
     )
 }

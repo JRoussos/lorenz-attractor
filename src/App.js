@@ -1,47 +1,26 @@
-import React, { useEffect, useRef, useState, useCallback } from "react"
+import React, { useEffect, useRef } from "react"
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { OrbitControls, Line } from "@react-three/drei"
-import { Vector3, AdditiveBlending } from 'three'
+import { Canvas, useFrame } from "@react-three/fiber"
+import { OrbitControls } from "@react-three/drei"
+import { Vector3, AdditiveBlending, Euler, Quaternion } from 'three'
 
 import "./App.css"
+import { Bloom, EffectComposer } from "@react-three/postprocessing"
+import { KernelSize } from 'postprocessing'
 
-const Lines = ({ stPoint, color }) => {
-    // const [ lorenzSystem, setLorenzSystem ] = useState([stPoint])
+const Line = ({ stPoint, color }) => {
     const SIGMA = 10
     const RHO   = 28
     const BETA  = 8/3
     
-    const DELTA = 0.005 // The delta time to ensure the same result on every device
+    const DELTA = 0.004 // The delta time hardcoded to ensure the same result on every device
     const MAX_POINTS = 10000 // Max number of points the line consist of, after that the line collapses into itself
     let number_of_points = 0
     
     const meshRef = useRef()
-    const { camera } = useThree()
 
     const points = []
     points.push(stPoint)
-
-    useEffect(() => {
-        meshRef.current.geometry.setFromPoints(points)
-        // if(!meshRef.current) return
-
-        // const points = []
-        // points.push(stPoint)
-    
-        // let point = stPoint
-    
-        //     for (var i=0; i<15000; i++) {
-        //         point = new Vector3(
-        //             point.x + SIGMA * (point.y - point.x) * DELTA,
-        //             point.y + ( (RHO * point.x) - point.y - (point.x * point.z) ) * DELTA,
-        //             point.z + ( (point.x * point.y) - (BETA * point.z) ) * DELTA
-        //         );
-        //         points.push(point);
-        //     }
-        //     setLorenzSystem(points)
-
-    }, [])
 
     useFrame(() => {
         const { x, y, z } = points[number_of_points]
@@ -54,29 +33,27 @@ const Lines = ({ stPoint, color }) => {
         
         meshRef.current.geometry.setFromPoints(points)
 
+        if(number_of_points === 300 ) console.log(x, y, z)
+
         if(number_of_points > MAX_POINTS) points.splice(0, 1)
         else number_of_points ++
     })
 
     return (
-        // <mesh ref={meshRef}>
-        //     <Line ref={meshRef} color={color} lineWidth={1} points={lorenzSystem} transparent={true} depthTest={false} depthWrite={false}/>
-        //     <lineBasicMaterial attach="material"/>
-        // </mesh>
         <line ref={meshRef} frustumCulled={false} position={[0, 0, 0]}>
-            <bufferGeometry attach="geometry"/>
+            <bufferGeometry attach="geometry" />
             <lineBasicMaterial attach="material" color={color} transparent={true} depthTest={false} depthWrite={false} blending={AdditiveBlending}/>
         </line>
     )
 }
 
-function App() {
-    const cameraProps = {
-        position: [-100, 0, 50],
-        fov: 40,
-        far: 1000,
-        near: 0.01
-    }
+const Lines = () => {
+    const rotationEuler = new Euler(0, 0, 0)
+    const rotationQuaternion = new Quaternion(0, 0, 0, 0)
+    let rotation = 0
+    
+    const groupRef = useRef()
+    const rotate = useRef(true)
 
     const line_config = [
         {starting_point: new Vector3(0.01, 0.01, 0.01), color: '#d46428'}, // #f58549 
@@ -84,11 +61,54 @@ function App() {
         {starting_point: new Vector3(0.03, 0.01, 0.01), color: '#deac52'}, // #eec170 
     ]
 
+    useFrame(() => {
+        if( rotate.current ) {
+            rotation += 0.0005
+ 
+            rotationEuler.set( rotation, rotation, 0 )
+            rotationQuaternion.setFromEuler(rotationEuler)
+
+            groupRef.current.quaternion.slerp(rotationQuaternion, 0.1)
+        }
+
+        // groupRef.current.rotation.x += 0.001
+        // groupRef.current.rotation.y += 0.001
+    })
+
+    useEffect(() => {
+        const handleRotation = () => {
+            rotate.current = !rotate.current 
+        }
+
+        window.addEventListener('keypress',   handleRotation)
+        window.addEventListener('touchstart', handleRotation)
+        window.addEventListener('touchend',   handleRotation)
+    }, [])
+
+    return (
+        <group ref={groupRef}>
+            {line_config.map(line => <Line key={Math.random()} stPoint={line.starting_point} color={line.color}/> )}
+        </group>   
+    )
+}
+
+const App = () => {
+    const cameraProps = {
+        position: [0, 0, 100],
+        fov: 40,
+        far: 1000,
+        near: 0.01
+    }
+
     return (
         <div className="canvas-container">
             <Canvas dpr={[window.devicePixelRatio, 2]} camera={cameraProps}>
-                {line_config.map(line => <Lines key={Math.random()} stPoint={line.starting_point} color={line.color}/> )}
-                <OrbitControls autoRotate autoRotateSpeed={0.3}/>
+                <color attach="background" args={['black']} />
+                <Lines/>
+                <EffectComposer>
+                    <Bloom kernelSize={KernelSize.HUGE} luminanceThreshold={0} luminanceSmoothing={0} intensity={0.5} />
+                </EffectComposer>
+                <OrbitControls/>
             </Canvas>
         </div>
     )

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { Canvas, useFrame } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
@@ -6,7 +6,9 @@ import { Vector3, AdditiveBlending, Euler, Quaternion } from 'three'
 import { Bloom, EffectComposer } from "@react-three/postprocessing"
 import { KernelSize } from 'postprocessing'
 
+import Welcome from "./welcome"
 import Music from "./music"
+
 import "./App.css"
 
 const Line = ({ stPoint, color }) => {
@@ -92,6 +94,9 @@ const Lines = () => {
 }
 
 const App = () => {
+    const [ enter, setEnter ] = useState(false)
+    const postprocessing = new URLSearchParams(document.location.search.substring(1))
+
     const cameraProps = {
         position: [0, 0, 100],
         fov: 40,
@@ -100,6 +105,10 @@ const App = () => {
     }
 
     useEffect(() => {
+        console.log("%c'This is a slightly sarcastic greeting title'", "margin: 1em 0; font-style: italic;",`
+        Due to performance limitations of most devices, post processing had to disabled by default. 
+        If you are one of the bold ones you can enable it by using the '/?post=1' param at the end of the URL, 
+        or just click this link: https://lorenz-attractor-visualization.netlify.app/?post=1 and enjoy ✨`)
         window.addEventListener('dblclick', () => {
             if(!document.fullscreenElement) document.getElementById('canvas-container').requestFullscreen()
             else document.exitFullscreen()
@@ -108,15 +117,19 @@ const App = () => {
 
     return (
         <div id="canvas-container">
-            <Canvas dpr={[window.devicePixelRatio, 2]} camera={cameraProps}>
-                <color attach="background" args={['black']} />
-                <Lines/>
-                <EffectComposer>
-                    <Bloom kernelSize={KernelSize.HUGE} luminanceThreshold={0} luminanceSmoothing={0} intensity={0.5} />
-                </EffectComposer>
-                <OrbitControls maxDistance={200}/>
-            </Canvas>
-            <Music/>
+            {enter ?
+                <React.Fragment>
+                    <Canvas dpr={[window.devicePixelRatio, 2]} camera={cameraProps}>
+                        <color attach="background" args={['black']} />
+                        <Lines/>
+                        <EffectComposer enabled={parseInt(postprocessing.get('post'))}>
+                            <Bloom kernelSize={KernelSize.HUGE} luminanceThreshold={0} luminanceSmoothing={0} intensity={0.5} />
+                        </EffectComposer>
+                        <OrbitControls maxDistance={200}/>
+                    </Canvas>
+                    <Music/>
+                </React.Fragment> : 
+            <Welcome setEnter={setEnter}/> }
         </div>
     )
 }

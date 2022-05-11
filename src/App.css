@@ -36,3 +36,73 @@
     transform: scaleY(0.1);
     will-change: transform;
 }
+
+.welcome {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+
+    background: #000;
+}
+
+.welcome p {
+    font-family: 'Rubik';
+    color: rgba(255, 255, 255, 0.8);
+
+    width: 80vw;
+    max-width: 600px;
+
+    line-height: 18px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.table {
+    margin: 20px 0;
+}
+
+.table span {
+    opacity: 0;
+    display: inline-block;
+    transform: translateY(10px);
+    transform-origin: left;
+
+    will-change: transform;
+}
+
+.table:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sec-table {
+    opacity: 0;
+}
+
+.table button {
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-radius: 2px;
+    padding: 10px 100px;
+
+    margin: 10px 0;
+    background: none;
+
+    color:rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    font-family: 'Rubik';
+
+    cursor: pointer;
+
+    transition: all 0.2s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+
+.table button:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.1);
+}

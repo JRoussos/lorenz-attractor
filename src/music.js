@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react'
+import React, { useRef, useCallback, useEffect } from 'react'
 import { gsap } from 'gsap'
 
 import music from './assets/background.mp3'
@@ -6,14 +6,14 @@ import music from './assets/background.mp3'
 const Music = () => {
     const CROSSFADE_TIME = 3
 
-    const audio_1 = useRef(new Audio(music))
-    const audio_2 = useRef(new Audio(music))
+    const audio_1 = new Audio(music)
+    const audio_2 = new Audio(music)
     
-    const timeoutRef  = useRef()
+    const timeoutRef = useRef()
     let audio_main = audio_1
 
     const getTimeLeft = useCallback((audioRef) => {
-        let timeLeft = audioRef.current.duration - audioRef.current.currentTime
+        let timeLeft = audioRef.duration - audioRef.currentTime
         return timeLeft < 1 ? timeLeft : 1
     }, [])
 
@@ -21,38 +21,38 @@ const Music = () => {
         timeoutRef.current = setTimeout(() => {
             try {
                 audio_main = audioRef_nex
-                audio_main.current.currentTime = 0
-                audio_main.current.volume = 0.8
+                audio_main.currentTime = 0
+                audio_main.volume = 0.8
                 
-                audio_main.current.play()
+                audio_main.play()
                 setCrossFadeTimer(audioRef_nex, audioRef_cur)
             } catch (error) {
                 clearTimeout(timeoutRef.current)                
             }
-        }, (audioRef_cur.current.duration - CROSSFADE_TIME) * 1000)
+        }, (audioRef_cur.duration - CROSSFADE_TIME) * 1000)
     }
 
     const beforePlay = () => {
-        audio_main.current.currentTime = 0
-        audio_main.current.volume = 0.8
+        audio_main.currentTime = 0
+        audio_main.volume = 0.8
 
-        audio_main.current.play()
+        audio_main.play()
 
         setCrossFadeTimer(audio_1, audio_2)
     }
 
     const beforePause = () => {
         clearTimeout(timeoutRef.current)
-        gsap.to(audio_main.current, {id: 'fade_out', duration: getTimeLeft(audio_main), volume: 0, onComplete: () => {
-            audio_main.current.currentTime = audio_main.current.duration
-            audio_main.current.pause()
+        gsap.to(audio_main, {id: 'fade_out', duration: getTimeLeft(audio_main), volume: 0, onComplete: () => {
+            audio_main.currentTime = audio_main.duration
+            audio_main.pause()
         }})
     }
 
     const handleAudio = () => {
         const bars = document.querySelectorAll('.audio-bar')
 
-        if(audio_main.current.paused) {
+        if(audio_main.paused) {
             beforePlay()
             
             bars.forEach((element, index) => { 
@@ -69,6 +69,10 @@ const Music = () => {
             })
         }
     }
+
+    useEffect(() => {
+        setTimeout(() => handleAudio(), 1000)
+    }, [])
 
     return (
         <div className="audio" onClick={handleAudio}>

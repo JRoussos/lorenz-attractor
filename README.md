@@ -1,70 +1,32 @@
-# Getting Started with Create React App
+# Lorenz Attractor
+[![](preview.gif "Live Preview")](https://lorenz-attractor-visualization.netlify.app/)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Live Preview](https://lorenz-attractor-visualization.netlify.app/)
 
-## Available Scripts
+So I have been reading [this book](https://www.goodreads.com/book/show/486658.Chaos "Chaos, The amazing science of the unpredictable") lately by James Gleick, about Chaos theory and the science of unpredictable events, and thus far it is a really good read. In it there is a chapter that describes the story of Edward Lorenz and his discovery of the butterfly effect (it is very interesting, [read here](https://www.aps.org/publications/apsnews/200301/history.cfm)), reading that inspired me to make my version of the famous lorenz attractor.
 
-In the project directory, you can run:
+Lorenz found that if you have a system with some initial values that are basically the same but only having the tiniest deviation from one another, as time passes those tiny differences scale up and that after a few iterations the values end up completely unrelated and with their own trajectory. And the cool part is that the system will never repeat itself and so the points will never intersect.
 
-### `npm start`
+The equations Lorenz used are a simplified mathematical model for atmospheric convection. The model is a system of those three ordinary differential equations:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+    dx/dt = σ * (y - x),
+    dy/dt = x * (ρ - z) - y,
+    dz/dt = x * y - β * z
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To make the system behave chaotic he used the values σ = 10, β = 8/3 and ρ = 28.
 
-### `npm test`
+### Overcoming Problems
+- I wanted to have a bloom effect around the lines and so I added some post processing action but due to performance limitations of most devices, I had to disabled it by default. If you want you can enable it by using the '/?post=1' parameter at the end of the URL, or just click [here](https://lorenz-attractor-visualization.netlify.app/?post=1 )
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+### Run
+- Install `npm install`
+- Run `npm start`
+- Build `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Libraries
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- [Three.js](https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene) - The WebGL library behind all the animations
+- [R3f](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction) - A React renderer for three.js
+- [gsap](https://greensock.com/gsap/) - A JavaScript animation library 
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

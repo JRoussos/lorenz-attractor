@@ -10,6 +10,7 @@ const Music = () => {
     const audio_2 = new Audio(music)
     
     const timeoutRef = useRef()
+    const flagRef = useRef(true)
     let audio_main = audio_1
 
     const getTimeLeft = useCallback((audioRef) => {
@@ -68,11 +69,16 @@ const Music = () => {
                 gsap.to(element, {duration: 0.6, scaleY: 0.1})
             })
         }
+        audio_main.removeEventListener('canplaythrough', handleAudio) 
     }
 
     useEffect(() => {
-        setTimeout(() => handleAudio(), 1000)
+        if(flagRef.current) {
+            audio_main.addEventListener('canplaythrough', handleAudio)
+            flagRef.current = false
+        }
     }, [])
+
 
     return (
         <div className="audio" onClick={handleAudio}>

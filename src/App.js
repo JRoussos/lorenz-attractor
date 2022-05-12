@@ -51,7 +51,7 @@ const Line = ({ stPoint, color }) => {
 const Lines = () => {
     const rotationEuler = new Euler(0, 0, 0)
     const rotationQuaternion = new Quaternion(0, 0, 0, 0)
-    let rotation = 0
+    let rotation = 1.5708
     
     const groupRef = useRef()
     const rotate = useRef(true)
@@ -64,9 +64,9 @@ const Lines = () => {
 
     useFrame(({ camera }) => {
         if( rotate.current ) {
-            rotation += 0.0005 * (camera.position.z /200) // Slow rotation speed as the user zooms in
+            rotation += 0.001 * (camera.position.z /200) // Slow rotation speed as the user zooms in
  
-            rotationEuler.set( rotation, rotation, 0 )
+            rotationEuler.set( rotation, rotation, -0.2239 )
             rotationQuaternion.setFromEuler(rotationEuler)
 
             groupRef.current.quaternion.slerp(rotationQuaternion, 0.1)
@@ -125,7 +125,7 @@ const App = () => {
                         <EffectComposer enabled={parseInt(postprocessing.get('post'))}>
                             <Bloom kernelSize={KernelSize.HUGE} luminanceThreshold={0} luminanceSmoothing={0} intensity={0.5} />
                         </EffectComposer>
-                        <OrbitControls maxDistance={200}/>
+                        <OrbitControls maxDistance={200} />
                     </Canvas>
                     <Music/>
                 </React.Fragment> : 
